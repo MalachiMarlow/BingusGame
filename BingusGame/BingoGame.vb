@@ -10,32 +10,67 @@ Option Compare Text
 '[] Display Bingo Board
 '[] Draw a random ball that has not already been drawn
 '[] update display ot show all drawn balls
+'[] update display to show actual ball number
 '[] refresh tracking with "C" or when all balls have been drawn
 
 Module BingoGame
 
     Sub Main()
-        DisplayBoard()
+
+        For i = 1 To 10
+            drawBall()
+            DisplayBoard()
+            Console.Read()
+            Console.Clear()
+        Next
+
     End Sub
 
-    Function BingoTracker(ballNumber As Integer, ballLetter As Integer) As Boolean(,)
+    Sub drawBall()
+        Dim temp(,) As Boolean = BingoTracker(0, 0)
+        Dim currentBallNumber As Integer
+        Dim currentBallLetter As Integer
+
+        'loop until the current random ball has not already been marked as drawn
+        Do
+            currentBallNumber = randomNumberBetween(0, 14) 'get the row
+
+            currentBallLetter = randomNumberBetween(0, 4) ' get the column
+
+        Loop Until temp(currentBallNumber, currentBallLetter) = False
+
+        'mark current ball as being drawn, updates the display
+        BingoTracker(currentBallNumber, currentBallLetter)
+
+        Console.WriteLine($"The current row is {currentBallNumber} and column is {currentBallLetter}")
+
+    End Sub
+
+    Function BingoTracker(ballNumber As Integer, ballLetter As Integer, Optional clear As Boolean = False) As Boolean(,)
         Static _bingoTracker(14, 4) As Boolean
         'actual code here
+        _bingoTracker(ballNumber, ballLetter) = True
         Return _bingoTracker
     End Function
 
     Sub DisplayBoard()
-        Dim temp As String = "X |"
+        Dim Temp As String = " |"
         Dim heading() As String = {"B", "I", "N", "G", "O"}
+        Dim tracker(,) As Boolean = BingoTracker(0, 0)
         For Each letter In heading
             Console.Write(letter.PadLeft(2).PadRight(4))
         Next
         Console.WriteLine()
         Console.WriteLine(StrDup(20, "_"))
-        For i = 1 To 15
-            For j = 1 To 5
-                temp = temp.PadLeft(4)
-                Console.Write(temp)
+        For currentNumber = 0 To 14 'fix, loop through array
+            For currentLetter = 0 To 4 'fix
+                If tracker(currentNumber, currentLetter) Then
+                    Temp = "X |"
+                Else
+                    Temp = " |"
+                End If
+                Temp = Temp.PadLeft(4)
+                Console.Write(Temp)
             Next
             Console.WriteLine()
         Next
